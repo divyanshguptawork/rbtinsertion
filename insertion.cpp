@@ -4,6 +4,8 @@
 #include <iomanip>
 using namespace std;
 
+enum Color {RED, BLACK};
+
 struct Node {
     int data;
   Color color;
@@ -12,11 +14,39 @@ struct Node {
   Node(int val) : data(val), color(RED), left(nullptr), right(nullptr), parent(nullptr) {}
 };
 
-class BST {
+class RedBlackTree {
 private:
     Node* root;
 
-    // Helper: Recursive insertion
+  // Inside private:
+void rotateLeft(Node* x) {
+    Node* y = x->right;
+    x->right = y->left;
+    if (y->left != nullptr) y->left->parent = x;
+    y->parent = x->parent;
+    if (x->parent == nullptr) root = y;
+    else if (x == x->parent->left) x->parent->left = y;
+    else x->parent->right = y;
+    y->left = x;
+    x->parent = y;
+}
+
+void rotateRight(Node* x) {
+    Node* y = x->left;
+    x->left = y->right;
+    if (y->right != nullptr) y->right->parent = x;
+    y->parent = x->parent;
+    if (x->parent == nullptr) root = y;
+    else if (x == x->parent->right) x->parent->right = y;
+    else x->parent->left = y;
+    y->right = x;
+    x->parent = y;
+}
+
+
+
+
+  
     Node* insert(Node* node, int val) {
         if (node == nullptr) {
             return new Node(val);
