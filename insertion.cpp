@@ -2,15 +2,14 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-
-//forgot to do using namespace std
+using namespace std;
 
 struct Node {
     int data;
-    Node* left;
-    Node* right;
+  Color color;
+  Node *left, *right, *parent;
 
-    Node(int val) : data(val), left(nullptr), right(nullptr) {}
+  Node(int val) : data(val), color(RED), left(nullptr), right(nullptr), parent(nullptr) {}
 };
 
 class BST {
