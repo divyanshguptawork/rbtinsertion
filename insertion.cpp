@@ -43,21 +43,45 @@ void rotateRight(Node* x) {
     x->parent = y;
 }
 
-
-
-
-  
-    Node* insert(Node* node, int val) {
-        if (node == nullptr) {
-            return new Node(val);
+  void fixInsert(Node* k) {
+    while (k != root && k->parent->color == RED) {
+        if (k->parent == k->parent->parent->left) {
+            Node* u = k->parent->parent->right; 
+            if (u != nullptr && u->color == RED) {
+                u->color = BLACK;
+                k->parent->color = BLACK;
+                k->parent->parent->color = RED;
+                k = k->parent->parent;
+            } else {
+                if (k == k->parent->right) {
+                    k = k->parent;
+                    rotateLeft(k);
+                }
+                k->parent->color = BLACK;
+                k->parent->parent->color = RED;
+                rotateRight(k->parent->parent);
+            }
+        } else {
+            Node* u = k->parent->parent->left; 
+            if (u != nullptr && u->color == RED) {
+                u->color = BLACK;
+                k->parent->color = BLACK;
+                k->parent->parent->color = RED;
+                k = k->parent->parent;
+            } else {
+                if (k == k->parent->left) {
+                    k = k->parent;
+                    rotateRight(k);
+                }
+                k->parent->color = BLACK;
+                k->parent->parent->color = RED;
+                rotateLeft(k->parent->parent);
+            }
         }
-        if (val < node->data) {
-            node->left = insert(node->left, val);
-        } else if (val > node->data) {
-            node->right = insert(node->right, val);
-        }
-        return node;
     }
+    root->color = BLACK;
+}
+
 
     // Helper: Recursive search
     bool search(Node* node, int val) {
