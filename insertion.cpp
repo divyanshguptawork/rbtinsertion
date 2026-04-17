@@ -82,91 +82,76 @@ void rotateRight(Node* x) {
     root->color = BLACK;
 }
 
-
-    // Helper: Recursive search
-    bool search(Node* node, int val) {
-        if (node == nullptr) return false;
-        if (node->data == val) return true;
-        
-        if (val < node->data) return search(node->left, val);
-        return search(node->right, val);
+  // Update public add method
+void add(int data) {
+    Node* node = new Node(data);
+    Node* y = nullptr;
+    Node* x = root;
+    while (x != nullptr) {
+        y = x;
+        if (node->data < x->data) x = x->left;
+        else x = x->right;
     }
+    node->parent = y;
+    if (y == nullptr) root = node;
+    else if (node->data < y->data) y->left = node;
+    else y->right = node;
 
-    // Helper: Find the smallest node in a subtree (In-order Successor)
-    Node* findMin(Node* node) {
-        Node* current = node;
-        while (current && current->left != nullptr) {
-            current = current->left;
-        }
-        return current;
+    if (node->parent == nullptr) {
+        node->color = BLACK;
+        return;
     }
+    if (node->parent->parent == nullptr) return;
+    fixInsert(node);
+}
 
-    // Helper: Recursive removal with 3 cases
-    Node* remove(Node* node, int val) {
-        if (node == nullptr) return nullptr;
-
-        if (val < node->data) {
-            node->left = remove(node->left, val);
-        } else if (val > node->data) {
-            node->right = remove(node->right, val);
-        } else {
-            // Case 1 & 2: No child or only one child
-            if (node->left == nullptr) {
-                Node* temp = node->right;
-                delete node;
-                return temp;
-            } else if (node->right == nullptr) {
-                Node* temp = node->left;
-                delete node;
-                return temp;
-            }
-
-            // Case 3: Two children
-            // Get the in-order successor (smallest in the right subtree)
-            Node* temp = findMin(node->right);
-            node->data = temp->data;
-            // Delete the successor
-            node->right = remove(node->right, temp->data);
-        }
-        return node;
-    }
-
-    // Helper: Visual representation (Rotated 90 degrees)
-    void printTree(Node* root, int indent) {
-        if (root == nullptr) return;
-
-        indent += 8;
-        // Print Right first (appears at top)
-        printTree(root->right, indent);
-
-        std::cout << std::endl;
-        std::cout << std::setw(indent) << root->data << std::endl;
-
-        // Print Left (appears at bottom)
-        printTree(root->left, indent);
-    }
+// Update printHelper inside private
+void printHelper(Node* n, int space) {
+    if (n == nullptr) return;
+    space += 10;
+    printHelper(n->right, space);
+    cout << endl << setw(space) << n->data 
+         << (n->color == RED ? "[R]" : "[B]") 
+         << " (P:" << (n->parent ? to_string(n->parent->data) : "N") << ")" << endl;
+    printHelper(n->left, space);
+}
 
 public:
-    BST() : root(nullptr) {}
+    RedBlackTree() : root(nullptr) {}
 
-    void add(int val) {
-        root = insert(root, val);
-    }
+    void insert(int data) {
+      Node* node = new Node(data);
+      Node* y = nullptr;
+      Node* x = root;
 
-    void remove(int val) {
-        root = remove(root, val);
-    }
+      //perform standard bst insertion
+              while (x != nullptr) {
+            y = x;
+            if (node->data < x->data) x = x->left;
+            else x = x->right;
+        }
 
-    bool contains(int val) {
-        return search(root, val);
+        node->parent = y;
+        if (y == nullptr) root = node;
+        else if (node->data < y->data) y->left = node;
+        else y->right = node;
+
+        // If the new node is root, color it black and return
+        if (node->parent == nullptr) {
+            node->color = BLACK;
+            return;
+        }
+        
+        // If grandparent doesn't exist, no need to fix properties
+        if (node->parent->parent == nullptr) return;
+
+        // Fix the tree to maintain RB properties
+        fixInsert(node);
     }
 
     void display() {
-        if (root == nullptr) {
-            std::cout << "The tree is currently empty." << std::endl;
-        } else {
-            printTree(root, 0);
-        }
+        if (root == nullptr) cout << "The tree is currently empty." << endl;
+        else printHelper(root, 0);
     }
 };
 
